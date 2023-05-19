@@ -14,7 +14,9 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private Calendar calendar;
 
     private TimePicker timePicker;
+
+    private List<Calendar> alarmTimes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +38,10 @@ public class MainActivity extends AppCompatActivity {
         displayDate();
 
         this.timePicker = findViewById(R.id.timePicker);
+        // 현재 시간 표시
+        displayTime();
 
-        findViewById(R.id.btnCalendar).setOnClickListener(mClickListener);
+        //findViewById(R.id.btnCalendar).setOnClickListener(mClickListener);
         findViewById(R.id.btnAlarm).setOnClickListener(mClickListener);
     }
 
@@ -45,7 +51,13 @@ public class MainActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.txtDate)).setText(format.format(this.calendar.getTime()));
     }
 
-    /* DatePickerDialog 호출 */
+    /* 시간 표시 */
+    private void displayTime() {
+        SimpleDateFormat format = new SimpleDateFormat("a HH:mm", Locale.getDefault());
+        ((TextView) findViewById(R.id.txtTime)).setText(format.format(this.calendar.getTime()));
+    }
+
+    /* DatePickerDialog 호출
     private void showDatePicker() {
         DatePickerDialog dialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -61,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         }, this.calendar.get(Calendar.YEAR), this.calendar.get(Calendar.MONTH), this.calendar.get(Calendar.DAY_OF_MONTH));
 
         dialog.show();
-    }
+    } */
 
     /* 알람 등록 */
     private void setAlarm() {
@@ -76,13 +88,20 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // 알람 시간을 리스트에 추가
+        alarmTimes.add(calendar);
+
         // Receiver 설정
         Intent intent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
+        //intent.putExtra("content", "알람 등록 테스트");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmTimes.size() - 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+       // PendingIntent pendingIntent1 = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         // 알람 설정
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, this.calendar.getTimeInMillis(), pendingIntent);
+//        alarmManager.set(AlarmManager.RTC_WAKEUP, this.calendar.getTimeInMillis(), pendingIntent);
+
+        alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(this.calendar.getTimeInMillis(), null), pendingIntent);
+        //alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(this.calendar.getTimeInMillis() + 10000, null), pendingIntent1);
 
         // Toast 보여주기 (알람 시간 표시)
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
@@ -93,10 +112,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             int viewId = v.getId();
-            if (viewId == R.id.btnCalendar) { // btnCalendar 버튼의 리소스 ID로 변경
+            /*if (viewId == R.id.btnCalendar) { // btnCalendar 버튼의 리소스 ID로 변경
                 // 달력
                 showDatePicker();
-            } else if (viewId == R.id.btnAlarm) { // btnAlarm 버튼의 리소스 ID로 변경
+            } else */
+            if (viewId == R.id.btnAlarm) { // btnAlarm 버튼의 리소스 ID로 변경
                 // 알람 등록
                 setAlarm();
             }
