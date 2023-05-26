@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 알람 시간을 리스트에 추가
-        alarmTimes.add(calendar);
+        alarmTimes.add((Calendar) calendar.clone());
 
         // Receiver 설정
         Intent intent = new Intent(this, AlarmReceiver.class);
