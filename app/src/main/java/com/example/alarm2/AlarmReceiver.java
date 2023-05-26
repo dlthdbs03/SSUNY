@@ -7,7 +7,7 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.widget.Toast;
 
-public class AlarmReceiver extends BroadcastReceiver {
+public class AlarmReceiver extends BroadcastReceiver {//
     private PowerManager.WakeLock wakeLock;
 
     @Override
